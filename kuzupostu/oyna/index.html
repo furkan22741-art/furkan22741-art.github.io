@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Kuzu Postu</title>
+    <style>
+      html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1c1a17; touch-action: none; overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
+      #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #1c1a17; outline: none; }
+      #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #f3e9d2; font-family: system-ui, sans-serif; background: #1c1a17; z-index: 5; }
+      #loading h1 { font-size: 34px; margin: 0 0 18px; letter-spacing: 1px; }
+      #bar { width: min(70vw, 360px); height: 12px; background: #3a342c; border-radius: 6px; overflow: hidden; }
+      #fill { width: 0%; height: 100%; background: #e0a84a; transition: width .2s; }
+      #msg { margin-top: 14px; font-size: 14px; opacity: .8; text-align: center; padding: 0 20px; }
+      #rotate { display: none; position: fixed; inset: 0; z-index: 9; background: #1c1a17; color: #f3e9d2; font-family: system-ui, sans-serif; align-items: center; justify-content: center; text-align: center; font-size: 20px; padding: 24px; }
+      @media (orientation: portrait) and (max-width: 800px) { #rotate { display: flex; } }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading">
+      <h1>Kuzu Postu</h1>
+      <div id="bar"><div id="fill"></div></div>
+      <div id="msg">Yükleniyor… ilk açılış birkaç saniye sürebilir.</div>
+    </div>
+    <div id="rotate">Telefonu yan çevir (yatay)<br>Oyun yatay oynanır.</div>
+    <script src="Build/WebGL.loader.js"></script>
+    <script>
+      var fill = document.getElementById("fill");
+      var loading = document.getElementById("loading");
+      var msg = document.getElementById("msg");
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        arguments: [],
+        dataUrl: "Build/WebGL.data",
+        frameworkUrl: "Build/WebGL.framework.js",
+        codeUrl: "Build/WebGL.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "puhulab",
+        productName: "Kuzu Postu",
+        productVersion: "0.9.0",
+      }, function (p) {
+        fill.style.width = Math.round(p * 100) + "%";
+      }).then(function () {
+        loading.style.display = "none";
+      }).catch(function (e) {
+        msg.textContent = "Oyun açılamadı: " + e;
+      });
+    </script>
+  </body>
+</html>
