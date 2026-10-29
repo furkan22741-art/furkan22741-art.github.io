@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1c1a17">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../img/ikon.png">
     <title>Kuzu Postu</title>
     <style>
       html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1c1a17; touch-action: none; overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
@@ -17,6 +20,9 @@
       #msg { margin-top: 14px; font-size: 14px; opacity: .8; text-align: center; padding: 0 20px; }
       #rotate { display: none; position: fixed; inset: 0; z-index: 9; background: #1c1a17; color: #f3e9d2; font-family: system-ui, sans-serif; align-items: center; justify-content: center; text-align: center; font-size: 20px; padding: 24px; }
       @media (orientation: portrait) and (max-width: 800px) { #rotate { display: flex; } }
+      #fs { position: fixed; left: 50%; top: 6px; transform: translateX(-50%); z-index: 8; width: 44px; height: 34px; border: 0; border-radius: 10px; background: rgba(40,36,30,.6); color: #f3e9d2; font-size: 20px; line-height: 34px; padding: 0; cursor: pointer; }
+      #fs.hide { display: none; }
+      #hint { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 7; background: rgba(40,36,30,.85); color: #f3e9d2; font-family: system-ui, sans-serif; font-size: 14px; padding: 8px 14px; border-radius: 10px; display: none; text-align: center; max-width: 80vw; }
     </style>
   </head>
   <body>
@@ -27,6 +33,46 @@
       <div id="msg">Yükleniyor… ilk açılış birkaç saniye sürebilir.</div>
     </div>
     <div id="rotate">Telefonu yan çevir (yatay)<br>Oyun yatay oynanır.</div>
+    <button id="fs" title="Tam ekran" aria-label="Tam ekran">&#x26F6;</button>
+    <div id="hint"></div>
+    <script>
+      (function () {
+        var fs = document.getElementById("fs"), hint = document.getElementById("hint");
+        var el = document.documentElement;
+        var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+        var ua = navigator.userAgent;
+        var isIOS = /iPhone|iPad|iPod/i.test(ua);
+        var mobile = /Android|iPhone|iPad|iPod/i.test(ua);
+        var standalone = (window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches) || window.navigator.standalone;
+        function isFull() { return document.fullscreenElement || document.webkitFullscreenElement; }
+        function enter() {
+          try { var p = req.call(el); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+          try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(function () {}); } catch (e) {}
+        }
+        function exit() { var ex = document.exitFullscreen || document.webkitExitFullscreen; if (ex) ex.call(document); }
+        function show(msg) { hint.textContent = msg; hint.style.display = "block"; setTimeout(function () { hint.style.display = "none"; }, 7000); }
+        if (standalone) fs.className = "hide";
+        fs.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (!req) { show(isIOS ? "iPhone: Paylaş > Ana Ekrana Ekle ile tam ekran oyna" : "Bu tarayıcı tam ekranı desteklemiyor"); return; }
+          if (isFull()) exit(); else enter();
+        });
+        // Telefonda ilk dokunuşta kendiliğinden tam ekran (tarayıcılar bunu yalnızca dokunuşla izin verir).
+        if (mobile && req && !standalone) {
+          var once = function () {
+            document.removeEventListener("touchend", once, true);
+            document.removeEventListener("click", once, true);
+            if (!isFull()) enter();
+          };
+          document.addEventListener("touchend", once, true);
+          document.addEventListener("click", once, true);
+        } else if (isIOS && !standalone) {
+          show("iPhone: Paylaş > Ana Ekrana Ekle ile tam ekran oynarsın");
+        }
+        document.addEventListener("fullscreenchange", function () { fs.innerHTML = isFull() ? "&#x2715;" : "&#x26F6;"; });
+        document.addEventListener("webkitfullscreenchange", function () { fs.innerHTML = isFull() ? "&#x2715;" : "&#x26F6;"; });
+      })();
+    </script>
     <script src="Build/WebGL.loader.js"></script>
     <script>
       var fill = document.getElementById("fill");

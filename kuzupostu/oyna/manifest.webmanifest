@@ -1,0 +1,13 @@
+{
+  "name": "Kuzu Postu",
+  "short_name": "Kuzu Postu",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#1c1a17",
+  "theme_color": "#1c1a17",
+  "icons": [
+    { "src": "../img/ikon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
